@@ -1,10 +1,12 @@
 package com.inexture.controller;
 
+import com.inexture.model.ApiResponse;
 import com.inexture.model.JwtRequest;
 import com.inexture.model.JwtResponse;
 import com.inexture.service.CustomUserDetailsService;
 import com.inexture.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,7 +39,7 @@ public class JwtController {
         catch (UsernameNotFoundException | BadCredentialsException e)
         {
             e.printStackTrace();
-            throw  new Exception("Bad Credential");
+            return ResponseEntity.ok(new ApiResponse<String>(Integer.parseInt("500"),"Bad Credential",null));
         }
 
         UserDetails userDetails = this.customUserDetailsService.loadUserByUsername(jwtRequest.getUsername());

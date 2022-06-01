@@ -1,6 +1,8 @@
 package com.inexture.config;
 
 
+import com.inexture.controller.JwtAuthenticationEntryPoint;
+import com.inexture.filter.JwtAuthenticationFilter;
 import com.inexture.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +26,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService myUserDetailsService;
 
-//    @Autowired
-//    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -33,18 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/signin","/gentoken")
+                .antMatchers("/users/adduser","/gentoken")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin()
-                .loginPage("/signin")
-                .loginProcessingUrl("/dologin")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .and()
-//                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
